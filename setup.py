@@ -7,8 +7,8 @@ with open('requirements.txt') as f:
 
 setup(
     name='pyicloud_ipd',
-    version='0.10.1',
-    url='https://github.com/ndbroadbent/pyicloud',
+    version="0.10.2",
+    url='https://github.com/icloud-photos-downloader/pyicloud',
     description=(
         'PyiCloud is a module which allows pythonistas to '
         'interact with iCloud webservices.'
@@ -22,8 +22,6 @@ setup(
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
     ],

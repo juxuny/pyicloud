@@ -1,0 +1,93 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Quality Checks
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    # branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+
+  check_quality:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.7, 3.8, 3.9, '3.10', 3.11]
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        scripts/install_deps
+
+    - name: Test
+      run: |
+        scripts/test
+
+  get_version:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Retrieve version and Changelog
+      id: get_version
+      run: |
+        echo pyicloud_ipd_version=$(cat setup.py | grep version= | cut -d'"' -f 2) >> $GITHUB_OUTPUT
+        echo 'pyicloud_ipd_changelog<<EOF' >> $GITHUB_OUTPUT
+        scripts/extract_releasenotes CHANGELOG.md >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
+
+    - name: Log version and Changelog
+      run: |
+        echo "pyicloud_ipd_version=${{steps.get_version.outputs.pyicloud_ipd_version}}"
+        echo "pyicloud_ipd_changelog=${{steps.get_version.outputs.pyicloud_ipd_changelog}}"
+
+    outputs:
+      pyicloud_ipd_version: ${{steps.get_version.outputs.pyicloud_ipd_version}}
+      pyicloud_ipd_changelog: ${{steps.get_version.outputs.pyicloud_ipd_changelog}}
+
+  build:
+    runs-on: ${{ matrix.os }}
+    needs: [get_version]
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.11]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        scripts/install_deps
+
+    - name: Build
+      run: |
+        scripts/build
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: pyicloud_ipd-${{needs.get_version.outputs.pyicloud_ipd_version}}-artifacts
+        if-no-files-found: error
+        path: |
+          dist/pyicloud*
