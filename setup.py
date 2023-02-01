@@ -13,7 +13,7 @@ with open("README.rst", encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name="pyicloud",
+    name="pyicloud_ipd",
     version=VERSION,
     url=REPO_URL,
     download_url=REPO_URL + "/tarball/" + VERSION,
