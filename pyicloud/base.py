@@ -147,7 +147,7 @@ class PyiCloudService(object):
         self._password_filter = PyiCloudPasswordFilter(password)
         logger.addFilter(self._password_filter)
 
-        self._home_endpoint = 'https://www.icloud.com'
+        self._home_endpoint = 'https://www.icloud.com.cn'
         self._setup_endpoint = 'https://setup.icloud.com/setup/ws/1'
 
         self._base_login_url = '%s/login' % self._setup_endpoint
